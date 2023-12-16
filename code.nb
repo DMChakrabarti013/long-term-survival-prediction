@@ -1,0 +1,49 @@
+L = {{0.000, 0.045, 0.391, 0.472, 0.484, 0.546, 0.543, 0.502, 0.468, 0.459, 
+         0.433, 0.421},
+     {0.845, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0},
+     {0, 0.975, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+     {0, 0, 0.965, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+     {0, 0, 0, 0.950, 0, 0, 0, 0, 0, 0, 0, 0 },
+     {0, 0,  0,  0, 0.926,0,0,  0, 0, 0,  0, 0 },
+     {0, 0,0, 0, 0, 0.895,0,0, 0, 0,0,0},
+     {0, 0,0, 0,0,0,0.850,0,0,0,  0, 0},
+     {0, 0, 0, 0, 0,0, 0, 0.786,0, 0, 0,0},
+     {0, 0, 0,  0, 0, 0, 0, 0, 0.691,0,  0,0 },
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0.561,0, 0},
+     {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.370,0}}; (*Leslie Matrix*)
+
+{eigvals, eigvecs} = Eigensystem[L];
+MatrixForm/@eigvecs; (*eigenvectors*)
+MatrixForm/@eigvals; (*eigenvalues*)
+xVec = {50,50,50,50,50,50,50,50,50,50,50,50}; (*initial population*)
+nextPop = L.xVec; (*matrix vector multiplication*)
+
+(*computing population for years via a recursive method*)
+(*population for year k is in row k+1*)
+n = 19; (* number of iterations *)
+results = {xVec}; (* list to store results *)
+
+For[i = 1, i <= n, i++,
+    xVec = L.xVec;
+    results = Append[results, xVec];
+]
+MatrixForm[results]
+
+(*plotting*)
+initPop = {50,50,50,50,50,50,50,50,50,50,50,50}; (*initial population*)
+
+endNum = 20; (*no. of iterations we want to compute*)
+vecs = Table[0,{i, endNum}, {j,1,12}];
+vecs[[1,1;;12]] = Flatten[initPop]; (*flatten the initial population matrix*)
+
+For[i = 2, i <= endNum, i++,
+    vecs[[i]] = L.vecs[[i-1]];
+]
+
+(* Separate the population vectors from vecs into individual lists *)
+populations = Transpose[vecs][[1;;12]];
+
+ListLinePlot[Transpose[vecs], PlotRange -> All, 
+ PlotLegends -> {"0-1", "1-2", "2-3", "3-4", "4-5", "5-6", "6-7", 
+   "7-8", "8-9", "9-10", "10-11", "11-12"},AxesLabel -> {"Years", "Population"}, 
+ FrameLabel -> {"Time", "Population"}, ImageSize -> Large]
